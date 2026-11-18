@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f2fafd;
+  --ink: #1b365d;
+  --pink: #e8f4fc;
+  --peach: #d7ecf9;
+  --mint: #eaf7fb;
+  --lilac: #dcebf8;
+  --butter: #f2f9fd;
+  --sky: #a0e0ef;
+  --accent: #005a9c;
+  --sage: #60c1e5;
+  --card: #ffffff;
+  --line: rgb(27 54 93 / 0.14);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-pink: var(--pink);
+  --color-peach: var(--peach);
+  --color-mint: var(--mint);
+  --color-lilac: var(--lilac);
+  --color-butter: var(--butter);
+  --color-sky: var(--sky);
+  --color-accent: var(--accent);
+  --color-sage: var(--sage);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --font-display: var(--ff-display);
+  --font-body: var(--ff-body);
+  --font-mono: var(--ff-mono);
+  --shadow-soft: 0 18px 44px -20px rgb(27 54 93 / 0.28);
+  --shadow-sticker: 0 12px 28px -12px rgb(27 54 93 / 0.35);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--ff-body);
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Infinite ticker. Two identical groups inside the track, shifted by -50%. */
+@keyframes marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee {
+  overflow: hidden;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--marquee-duration, 34s) linear infinite;
+}
+
+.marquee-track[data-reverse="true"] {
+  animation-direction: reverse;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Underline sweep for inline links */
+.link-sweep {
+  position: relative;
+}
+
+.link-sweep::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.link-sweep:hover::after,
+.link-sweep:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+
+  .link-sweep::after {
+    transition: none;
+  }
+}
