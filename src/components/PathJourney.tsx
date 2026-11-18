@@ -17,7 +17,7 @@ import { TINT_BG } from "@/lib/tints";
 const CURVE =
   "M 200 -20 C 60 40, 60 140, 200 200 C 340 260, 340 340, 200 400 C 60 460, 60 540, 200 600 C 340 660, 340 740, 200 800 C 60 840, 60 900, 200 960 L 200 1040";
 
-const STOP_AT = [0.08, 0.29, 0.5, 0.71, 0.9];
+const STOP_AT = [0.08, 0.29, 0.5, 0.71, 0.8];
 const SIDES = ["right", "left", "right", "left", "right"] as const;
 const BADGE_TILT = [-9, 10, -8, 11, -10];
 
@@ -103,50 +103,56 @@ export default function PathJourney() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
   const drawn = useSpring(scrollYProgress, { stiffness: 70, damping: 22, mass: 0.5 });
   const lineScale = reduce ? 1 : drawn;
+  // Fade the whole pinned stage out just before the section releases, so the
+  // next section slides in over an empty stage instead of colliding with the
+  // last stop's text.
+  const stageFade = useTransform(scrollYProgress, [0.86, 0.99], [1, 0]);
 
   return (
     <section ref={ref} id="path" className="relative md:h-[520vh]">
       {/* Desktop: sticky stage, curve draws itself with scroll */}
       <div className="sticky top-0 hidden h-screen overflow-hidden md:block">
-        <div className="absolute top-8 left-8 z-10">
-          <SectionLabel>{pathSection.label}</SectionLabel>
-          <h2 className="mt-3 font-display text-3xl leading-[0.9] uppercase lg:text-4xl">
-            {pathSection.title[0]}
-            <br />
-            {pathSection.title[1]}
-          </h2>
-        </div>
+        <motion.div className="absolute inset-0" style={{ opacity: reduce ? 1 : stageFade }}>
+          <div className="absolute top-8 left-8 z-10">
+            <SectionLabel>{pathSection.label}</SectionLabel>
+            <h2 className="mt-3 font-display text-3xl leading-[0.9] uppercase lg:text-4xl">
+              {pathSection.title[0]}
+              <br />
+              {pathSection.title[1]}
+            </h2>
+          </div>
 
-        <svg
-          viewBox="0 0 400 1000"
-          preserveAspectRatio="none"
-          className="absolute inset-0 h-full w-full"
-          aria-hidden="true"
-        >
-          <path d={CURVE} fill="none" stroke="var(--line)" strokeWidth="12" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-          <path
-            d={CURVE}
-            fill="none"
-            stroke="var(--accent)"
-            strokeOpacity="0.18"
-            strokeWidth="26"
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-          />
-          <motion.path
-            d={CURVE}
-            fill="none"
-            stroke="var(--accent)"
-            strokeWidth="12"
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-            style={{ pathLength: reduce ? 1 : drawn }}
-          />
-        </svg>
+          <svg
+            viewBox="0 0 400 1000"
+            preserveAspectRatio="none"
+            className="absolute inset-0 h-full w-full"
+            aria-hidden="true"
+          >
+            <path d={CURVE} fill="none" stroke="var(--line)" strokeWidth="12" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+            <path
+              d={CURVE}
+              fill="none"
+              stroke="var(--accent)"
+              strokeOpacity="0.18"
+              strokeWidth="26"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            <motion.path
+              d={CURVE}
+              fill="none"
+              stroke="var(--accent)"
+              strokeWidth="12"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+              style={{ pathLength: reduce ? 1 : drawn }}
+            />
+          </svg>
 
-        {pathSection.stops.map((stop, i) => (
-          <DesktopStop key={stop.wordA + stop.wordB} stop={stop} index={i} side={SIDES[i]} progress={scrollYProgress} reduce={reduce} />
-        ))}
+          {pathSection.stops.map((stop, i) => (
+            <DesktopStop key={stop.wordA + stop.wordB} stop={stop} index={i} side={SIDES[i]} progress={scrollYProgress} reduce={reduce} />
+          ))}
+        </motion.div>
       </div>
 
       {/* Mobile: simple vertical timeline, line still draws with scroll */}
